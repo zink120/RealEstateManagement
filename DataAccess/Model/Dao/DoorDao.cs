@@ -1,15 +1,12 @@
 ﻿using Model.DB.Interface;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Model.Model
+namespace Model.Model.Dao
 {
     public class DoorRecord
     {
-        public int DoorID { get; set; }
+        public int DoorID { get; internal set; }
         public int BuildingID { get; set; }
         public string Address { get; set; }
         public DateTime LastModifiedDate { get; set; }
@@ -51,6 +48,12 @@ namespace Model.Model
                                             _tableName,
                                             nameof(DoorRecord.DoorID));
             _db.Execute(deleteQuery, record);
+        }
+
+        public void ClearTable()
+        {
+            var deleteQuery = string.Format("DELETE {0}", _tableName);
+            _db.Execute(deleteQuery);
         }
 
         public IEnumerable<DoorRecord> Fetch()

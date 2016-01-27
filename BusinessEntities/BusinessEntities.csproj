@@ -55,14 +55,17 @@
     <Compile Include="Common\ISaveRepository.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="Exceptions\IdNotFoundException.cs" />
+    <Compile Include="Repository\TenantRepository.cs" />
     <Compile Include="Repository\Interface\IBuidingRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Repository\Interface\ITenantRepository.cs" />
     <Compile Include="Repository\Record\Building.cs" />
     <Compile Include="Repository\BuildingRepository.cs" />
     <Compile Include="Repository\Record\Door.cs" />
     <Compile Include="Repository\DoorRepository.cs" />
     <Compile Include="Repository\Interface\IDoorRepository.cs" />
     <Compile Include="Repository\Interface\IRepository.cs" />
+    <Compile Include="Repository\Record\Tenant.cs" />
     <Compile Include="Repository\Repository.cs" />
   </ItemGroup>
   <ItemGroup>

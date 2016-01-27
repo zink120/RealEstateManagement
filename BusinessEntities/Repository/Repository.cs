@@ -1,5 +1,4 @@
 ﻿using System;
-using Model.DB.Interface;
 using Model.Model;
 using BusinessEntities.Repository.Interface;
 
@@ -7,18 +6,20 @@ namespace BusinessEntities.Repository
 {
     public class Repository : IRepository
     {
-        public Repository(IDb db)
+        public Repository(IModelFactory factory)
         {
-            IModelFactory factory = new ModelFactory(db);
-
-            _building = new Lazy<IBuildingRepository>(()=>new BuildingRepository(factory.Building), true);
-            _door = new Lazy<IDoorRepository>(() => new DoorRepository(this, factory.Door), true);
+            _tenant = new Lazy<ITenantRepository>(() => new TenantRepository(factory.Tenant), true);
+            _door = new Lazy<IDoorRepository>(() => new DoorRepository(_tenant, factory.Door), true);
+            _building = new Lazy<IBuildingRepository>(()=>new BuildingRepository(_door, factory.Building), true);
+            
         }
 
         private Lazy<IBuildingRepository> _building;
         private Lazy<IDoorRepository> _door;
+        private Lazy<ITenantRepository> _tenant;
 
-        public IBuildingRepository Building { get { return _building.Value; } }
-        public IDoorRepository Door { get { return _door.Value; } }
+        public IBuildingRepository Building => _building.Value;
+        public IDoorRepository Door => _door.Value;
+        public ITenantRepository Tenant => _tenant.Value;
     }
 }

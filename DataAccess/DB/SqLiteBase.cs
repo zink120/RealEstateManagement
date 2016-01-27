@@ -1,8 +1,6 @@
 ﻿using Model.DB.Interface;
-using System;
 using System.Data.Common;
 using System.Data.SQLite;
-using System.IO;
 
 namespace Model.DB
 {

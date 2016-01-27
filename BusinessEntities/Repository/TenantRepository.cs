@@ -1,0 +1,80 @@
+﻿using AutoMapper;
+using System.Collections.Generic;
+using System.Collections.Concurrent;
+using System.Linq;
+using BusinessEntities.Exceptions;
+using BusinessEntities.Repository.Interface;
+using BusinessEntities.Repository.Record;
+using Model.Model.Dao;
+
+namespace BusinessEntities.Repository
+{
+    public class TenantRepository : ITenantRepository
+    {
+        private ConcurrentDictionary<int, ITenant> _cache;
+        private readonly object _lock = new object();
+        private readonly ITenantDao _dao;
+
+        public TenantRepository(ITenantDao dao)
+        {
+            _dao = dao;
+            lock(Constant.AutoMapperLock)
+                Mapper.CreateMap<TenantRecord, Tenant>();
+        }
+
+        public ITenant Get(int id)
+        {
+            ITenant data;
+            if (_cache != null && _cache.TryGetValue(id, out data))
+                return data;
+            lock (_lock)
+            {
+                LoadCache();
+                if (_cache.TryGetValue(id, out data))
+                    return data;
+                throw new IdNotFoundException(id, nameof(TenantRepository), nameof(TenantRepository.Get));
+            }
+        }
+
+        public IEnumerable<ITenant> GetAll()
+        {
+            LoadCache();
+            return _cache.Values.ToList();
+        }
+
+        public void ClearCache()
+        {
+            lock(_lock)
+                _cache = null;
+        }
+
+        public void Save(TenantRecord Tenant)
+        {
+            var record = _dao.Save(Tenant);
+            if (_cache == null) return;
+            lock(_lock)
+            {
+                if (_cache == null) return;
+                LoadData(record, _cache);
+            }
+        }
+
+        private void LoadCache()
+        {
+            if (_cache != null) return;
+            lock(_lock)
+            {
+                if (_cache != null) return;
+                ConcurrentDictionary<int, ITenant> cache = new ConcurrentDictionary<int, ITenant>();
+                foreach (var data in _dao.Fetch())
+                    LoadData(data, cache);
+                _cache = cache;
+            }
+        }
+
+        private void LoadData(TenantRecord record, ConcurrentDictionary<int, ITenant> cache)
+        {            
+            cache[record.TenantID] = Mapper.Map(record, new Tenant());
+        }
+    }
+}

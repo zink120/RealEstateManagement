@@ -1,7 +1,6 @@
 ﻿using Dapper;
 using Model.DB.Interface;
 using System.Collections.Generic;
-using System;
 
 namespace Model.DB
 {

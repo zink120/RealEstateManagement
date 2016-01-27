@@ -1,14 +1,27 @@
-﻿using Model.Model;
+﻿using Model.Model.Dao;
+using System;
+using System.Collections.Generic;
 
 namespace BusinessEntities.Repository.Record
 {
-    public class Building : BuildingRecord
+    public interface IBuilding
     {
-        private BuildingRepository _buildingRepository;
+        int BuildingID { get; }
+        string Name { get; }
+        DateTime LastModifiedDate { get; }
 
-        public Building(BuildingRepository buildingRepository)
+        IEnumerable<IDoor> Doors { get; }
+    }
+    public class Building : BuildingRecord, IBuilding
+    {
+        private Lazy<IEnumerable<IDoor>> _doors;
+
+        public Building(Lazy<IEnumerable<IDoor>> doors)
         {
-            _buildingRepository = buildingRepository;
+            _doors = doors;
         }
+
+        public IEnumerable<IDoor> Doors => _doors.Value;
+        
     }
 }

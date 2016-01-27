@@ -1,10 +1,10 @@
 ﻿using BusinessEntities.Common;
 using BusinessEntities.Repository.Record;
-using Model.Model;
+using Model.Model.Dao;
 
 namespace BusinessEntities.Repository.Interface
 {
-    public interface IBuildingRepository : IGetRepository<Building>, ISaveRepository<BuildingRecord>
+    public interface IBuildingRepository : IGetRepository<IBuilding>, ISaveRepository<BuildingRecord>
     {
 
     }

@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Model.Model
+namespace Model.Model.Dao
 {
     public class BuildingRecord
     {
@@ -21,7 +21,7 @@ namespace Model.Model
     public class BuildingDao : IBuildingDao
     {
         private IDbHelper _db;
-        private const string _tabName = "Building";
+        private const string _tableName = "Building";
         public BuildingDao(IDbHelper db)
         {
             _db = db;
@@ -30,11 +30,11 @@ namespace Model.Model
         public void CreateTable()
         {
             var createQuery = string.Format(@"DROP TABLE IF EXISTS {0};
-                                            CREATE TABLE Building (
+                                            CREATE TABLE  {0} (
                                             {1} INTEGER PRIMARY KEY AUTOINCREMENT,
                                             {2} VARCHAR(250) NOT NULL,
                                             {3} DATETIME NOT NULL);",
-                                            _tabName,
+                                            _tableName,
                                             nameof(BuildingRecord.BuildingID),
                                             nameof(BuildingRecord.Name),
                                             nameof(BuildingRecord.LastModifiedDate));
@@ -44,14 +44,20 @@ namespace Model.Model
         public void Delete(BuildingRecord record)
         {
             var deleteQuery = string.Format("DELETE {0} WHERE {1}=@{1}",
-                                            _tabName,
+                                            _tableName,
                                             nameof(record.BuildingID));
             _db.Execute(deleteQuery, record);
         }
 
+        public void ClearTable()
+        {
+            var deleteQuery = string.Format("DELETE {0}", _tableName);
+            _db.Execute(deleteQuery);
+        }
+
         public IEnumerable<BuildingRecord> Fetch()
         {
-            return _db.Query<BuildingRecord>($"SELECT * FROM {_tabName}");
+            return _db.Query<BuildingRecord>($"SELECT * FROM {_tableName}");
         }
 
         public BuildingRecord Save(BuildingRecord record)
@@ -67,7 +73,7 @@ namespace Model.Model
         {
             record.LastModifiedDate = DateTime.Now;
             var insertQuery = string.Format("INSERT INTO {0}({1}, {2}) VALUES (@{1}, @{2}); SELECT last_insert_rowid();",
-                                            _tabName,
+                                            _tableName,
                                             nameof(record.Name),
                                             nameof(record.LastModifiedDate));
 
@@ -79,7 +85,7 @@ namespace Model.Model
         {
             record.LastModifiedDate = DateTime.Now;
             var updateQuery = string.Format("UPDATE {0} SET {1}=@{1}, {2}=@{2} WHERE {3}=@{3}",
-                                            _tabName,
+                                            _tableName,
                                             nameof(record.Name),
                                             nameof(record.LastModifiedDate),
                                             nameof(record.BuildingID));

@@ -1,11 +1,10 @@
 ﻿using BusinessEntities.Common;
 using BusinessEntities.Repository.Record;
-using Model.Model;
+using Model.Model.Dao;
 
 namespace BusinessEntities.Repository.Interface
 {
-    public interface IDoorRepository : IGetRepository<Door>, ISaveRepository<DoorRecord>
+    public interface IDoorRepository : IGetRepository<IDoor>, ISaveRepository<DoorRecord>
     {
-        Building GetBuilding(Door door);
     }
 }

@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SandboxConsoleApp", "Sandbo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BusinessEntities", "BusinessEntities\BusinessEntities.csproj", "{7D0BEAAA-0AE4-4817-A79B-1E3437A224A4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidView", "AndroidView\AndroidView.csproj", "{0393D583-541C-43B7-8693-ABD7B6548E6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,12 @@ Global
 		{7D0BEAAA-0AE4-4817-A79B-1E3437A224A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D0BEAAA-0AE4-4817-A79B-1E3437A224A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D0BEAAA-0AE4-4817-A79B-1E3437A224A4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0393D583-541C-43B7-8693-ABD7B6548E6F}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

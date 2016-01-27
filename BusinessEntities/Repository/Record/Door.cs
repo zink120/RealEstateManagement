@@ -1,21 +1,27 @@
-﻿using Model.Model;
+﻿using Model.Model.Dao;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessEntities.Repository.Interface;
 
 namespace BusinessEntities.Repository.Record
 {
-    public class Door : DoorRecord
+    public interface IDoor
     {
-        private IDoorRepository _repository;
-        public Door(IDoorRepository repository)
+        int DoorID { get; }
+        int BuildingID { get; }
+        string Address { get; }
+        DateTime LastModifiedDate { get; }
+
+        IEnumerable<ITenant> Tenants { get; }
+    }
+    public class Door : DoorRecord, IDoor
+    {
+        private Lazy<IEnumerable<ITenant>> _tenants;
+
+        public Door(Lazy<IEnumerable<ITenant>> tenants)
         {
-            _repository = repository;
+            _tenants = tenants;
         }
 
-        public Building Building {  get { return _repository.GetBuilding(this); } }
+        public IEnumerable<ITenant> Tenants => _tenants.Value;
     }
 }
