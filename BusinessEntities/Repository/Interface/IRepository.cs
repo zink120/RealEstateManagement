@@ -5,5 +5,6 @@
         IBuildingRepository Building { get;}
         IDoorRepository Door { get; }
         ITenantRepository Tenant { get; }
+        ITenantInteractionRepository TenantInteraction { get; }
     }
 }

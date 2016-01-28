@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System;
+using AutoMapper;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace BusinessEntities.Repository
     {
         private ConcurrentDictionary<int, ITenant> _cache;
         private readonly object _lock = new object();
+        private readonly Lazy<ITenantInteractionRepository> _tenantInteraction;
         private readonly ITenantDao _dao;
 
-        public TenantRepository(ITenantDao dao)
+        public TenantRepository(Lazy<ITenantInteractionRepository> tenantInteraction, ITenantDao dao)
         {
+            _tenantInteraction = tenantInteraction;
             _dao = dao;
             lock(Constant.AutoMapperLock)
                 Mapper.CreateMap<TenantRecord, Tenant>();
@@ -65,7 +68,7 @@ namespace BusinessEntities.Repository
             lock(_lock)
             {
                 if (_cache != null) return;
-                ConcurrentDictionary<int, ITenant> cache = new ConcurrentDictionary<int, ITenant>();
+                var cache = new ConcurrentDictionary<int, ITenant>();
                 foreach (var data in _dao.Fetch())
                     LoadData(data, cache);
                 _cache = cache;
@@ -73,8 +76,11 @@ namespace BusinessEntities.Repository
         }
 
         private void LoadData(TenantRecord record, ConcurrentDictionary<int, ITenant> cache)
-        {            
-            cache[record.TenantID] = Mapper.Map(record, new Tenant());
+        {
+            var tenantID = record.TenantID;
+            var tenantInteraction = new Lazy<IEnumerable<ITenantInteraction>>(() => _tenantInteraction.Value.GetAll().Where(_ => _.TenantID == tenantID));
+
+            cache[record.TenantID] = Mapper.Map(record, new Tenant(tenantInteraction));
         }
     }
 }

@@ -1,33 +1,33 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Model.Model.Dao;
+﻿using System;
 using System.Collections.Concurrent;
-using BusinessEntities.Repository.Record;
+using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using BusinessEntities.Exceptions;
 using BusinessEntities.Repository.Interface;
-using System;
+using Model.Model.Dao;
 
-namespace BusinessEntities.Repository
+namespace BusinessEntities.Repository.Record
 {
-    public class DoorRepository : IDoorRepository
+    public class TenantInteractionRepository : ITenantInteractionRepository
     {
-        private ConcurrentDictionary<int, IDoor> _cache;
+        private ConcurrentDictionary<int, ITenantInteraction> _cache;
+        private readonly ITenantInteractionDao _dao;
         private readonly object _lock = new object();
-        private readonly IDoorDao _dao;
-        private readonly Lazy<ITenantRepository> _tenantRepository;
 
-        public DoorRepository(Lazy<ITenantRepository> tenantRepository, IDoorDao dao)
+        public TenantInteractionRepository(ITenantInteractionDao dao)
         {
-            _tenantRepository = tenantRepository;
             _dao = dao;
+
             lock (Constant.AutoMapperLock)
-                Mapper.CreateMap<DoorRecord, Door>();
+                Mapper.CreateMap<TenantInteractionRecord, TenantInteraction>();
         }
 
-        public IDoor Get(int id)
+
+
+        public ITenantInteraction Get(int id)
         {
-            IDoor data;
+            ITenantInteraction data;
             if (_cache != null && _cache.TryGetValue(id, out data))
                 return data;
             lock (_lock)
@@ -35,11 +35,11 @@ namespace BusinessEntities.Repository
                 LoadCache();
                 if (_cache.TryGetValue(id, out data))
                     return data;
-                throw new IdNotFoundException(id, nameof(DoorRepository), nameof(DoorRepository.Get));
+                throw new IdNotFoundException(id, nameof(TenantInteractionRepository), nameof(TenantInteractionRepository.Get));
             }
         }
 
-        public IEnumerable<IDoor> GetAll()
+        public IEnumerable<ITenantInteraction> GetAll()
         {
             LoadCache();
             return _cache.Values.ToList();
@@ -51,9 +51,9 @@ namespace BusinessEntities.Repository
                 _cache = null;
         }
 
-        public void Save(DoorRecord Door)
+        public void Save(TenantInteractionRecord Tenant)
         {
-            var record = _dao.Save(Door);
+            var record = _dao.Save(Tenant);
             if (_cache == null) return;
             lock (_lock)
             {
@@ -68,19 +68,16 @@ namespace BusinessEntities.Repository
             lock (_lock)
             {
                 if (_cache != null) return;
-                var cache = new ConcurrentDictionary<int, IDoor>();
+                var cache = new ConcurrentDictionary<int, ITenantInteraction>();
                 foreach (var data in _dao.Fetch())
                     LoadData(data, cache);
                 _cache = cache;
             }
         }
 
-        private void LoadData(DoorRecord record, ConcurrentDictionary<int, IDoor> cache)
+        private void LoadData(TenantInteractionRecord record, ConcurrentDictionary<int, ITenantInteraction> cache)
         {
-            int doorID = record.DoorID;
-
-            Lazy<IEnumerable<ITenant>> tenants = new Lazy<IEnumerable<ITenant>>(()=>_tenantRepository.Value.GetAll().Where(_=>_.DoorID == doorID));
-            cache[record.DoorID] = Mapper.Map(record, new Door(tenants));
+            cache[record.TenantID] = Mapper.Map(record, new TenantInteraction());
         }
     }
 }

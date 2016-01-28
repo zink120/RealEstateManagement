@@ -1,9 +1,11 @@
 ﻿using BusinessEntities.Exceptions;
 using BusinessEntities.Repository;
 using BusinessEntities.Repository.Interface;
+using BusinessEntities.Repository.Record;
 using Model.DB;
 using Model.DB.Interface;
 using Model.Model;
+using Model.Model.Dao;
 using System;
 
 namespace SandboxConsoleApp
@@ -13,32 +15,15 @@ namespace SandboxConsoleApp
         public static void Main(string[] args)
         {
             try
-            {   
-                var sqLiteBase = new SqLiteBase();
-                
-                CreateDataTable(sqLiteBase);
-                IRepository repository = new Repository(sqLiteBase);
-                var buildingRecord = new BuildingRecord { Name = "10e avenue" };
-                repository.Building.Save(buildingRecord);
+            {
+                IDb sqLiteBase = new SqLiteBase();
+                IModelFactory modelFactor = new ModelFactory(sqLiteBase);
+                IRepository repository = new Repository(modelFactor);
 
-                repository.Door.Save(new DoorRecord
-                                     {
-                                        BuildingID = 5,//buildingRecord.BuildingID,
-                                        Address = "5545, 10e avenue, Montréal, H1Y 2G9"
-                                     });
-
-                foreach (var res in repository.Building.GetAll())
-                    Console.WriteLine(string.Format("BuildingID: {0}, Name: {1}, LastModifiedDate: {2}",
-                                                    res.BuildingID,
-                                                    res.Name,
-                                                    res.LastModifiedDate));
-                foreach (var res in repository.Door.GetAll())
-                    Console.WriteLine(string.Format("DoorID: {0}, BuildingID: {1}, BuildingName:{2}, Adresse{3}, LastModifiedDate: {4}",
-                                                    res.DoorID,
-                                                    res.BuildingID,
-                                                    res.Building.Name,
-                                                    res.Address,
-                                                    res.LastModifiedDate));
+                modelFactor.DropDataTable();
+                modelFactor.CreateDataTable();
+                InsertFakeData(repository);
+                PrintResult(repository);
             }
             catch (IdNotFoundException e)
             {
@@ -54,10 +39,58 @@ namespace SandboxConsoleApp
             }
         }
 
-        private static void CreateDataTable(IDb db)
+        private static void PrintResult(IRepository repository)
         {
-            IModelFactory modelFactory = new ModelFactory(db);
-            modelFactory.CreateDataTable();
+            foreach (IBuilding res in repository.Building.GetAll())
+            {
+                Console.WriteLine($"BuildingID: {res.BuildingID}, Name: {res.Name}, LastModifiedDate: {res.LastModifiedDate}");
+
+                foreach (IDoor door in res.Doors)
+                {
+                    Console.WriteLine($"DoorID: {door.DoorID}, BuildingID: {door.BuildingID}, Adresse{door.Address}, LastModifiedDate: {door.LastModifiedDate}");
+                    foreach (ITenant tenant in door.Tenants)
+                    {
+                        Console.WriteLine($"TenantID: {tenant.TenantID}, Name: {tenant.FirstName} {tenant.LastName}, LastModifiedDate: {tenant.LastModifiedDate}");
+
+                        foreach (ITenantInteraction tenantInteraction in tenant.TenantInteractions)
+                        {
+                            Console.WriteLine($"TenantInteractionOD: {tenantInteraction.TenantInteractionID}, AsOfDate: {tenantInteraction.AsOfDate}, Comment: {tenantInteraction.Comment}, LastModifiedDate: {tenantInteraction.LastModifiedDate}");
+                        }
+                    }
+                }
+            }
+           
+        }
+
+        private static void InsertFakeData(IRepository repository)
+        {
+            var buildingRecord = new BuildingRecord { Name = "10e avenue" };
+            repository.Building.Save(buildingRecord);
+
+            var door5545 = new DoorRecord
+            {
+                BuildingID = buildingRecord.BuildingID,
+                Address = "5545, 10e avenue, Montréal, H1Y 2G9"
+            };
+            repository.Door.Save(door5545);
+
+            var thomasMorel = new TenantRecord()
+            {
+                DoorID = door5545.DoorID,
+                FirstName = "Thomas",
+                LastName = "Morel"
+            };
+
+            repository.Tenant.Save(thomasMorel);
+
+            var tenantInteractionRecord = new TenantInteractionRecord()
+            {
+                AsOfDate = DateTime.Today,
+                Comment = "Remise de son releve 31",
+                TenantID = thomasMorel.TenantID
+            };
+
+            repository.TenantInteraction.Save(tenantInteractionRecord);
         }
     }
 }

@@ -9,21 +9,18 @@ namespace Model.Model.Dao
         public int DoorID { get; internal set; }
         public int BuildingID { get; set; }
         public string Address { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime LastModifiedDate { get; internal set; }
     }
 
     public interface IDoorDao : IGenericDao<DoorRecord>, ICreateDbTable { }
     
-    public class DoorDao : IDoorDao
+    public class DoorDao : DaoAbstract<DoorRecord>, IDoorDao
     {
-        private IDbHelper _db;
-        private const string _tableName = "Door";
-        public DoorDao(IDbHelper db)
+        public DoorDao(IDbHelper db) : base(db, "Door")
         {
-            _db = db;
         }
-
-        public void CreateTable()
+        
+        public override void CreateTable()
         {
             var createQuery = string.Format(@"DROP TABLE IF EXISTS {0};
                                             CREATE TABLE {0} (
@@ -31,37 +28,25 @@ namespace Model.Model.Dao
                                             {2} INTEGER NOT NULL,
                                             {3} VARCHAR(250) NOT NULL,
                                             {4} DATETIME NOT NULL,
-                                            FOREIGN KEY ({2}) REFERENCES Building({5})
+                                            FOREIGN KEY ({2}) REFERENCES Building({2})
                                             );",
-                                            _tableName,
+                                            TableName,
                                             nameof(DoorRecord.DoorID),
                                             nameof(DoorRecord.BuildingID),
                                             nameof(DoorRecord.Address),
-                                            nameof(DoorRecord.LastModifiedDate),
-                                            nameof(BuildingRecord.BuildingID));
-            _db.Execute(createQuery);
+                                            nameof(DoorRecord.LastModifiedDate));
+            Db.Execute(createQuery);
         }
 
-        public void Delete(DoorRecord record)
+        public override void Delete(DoorRecord record)
         {
             var deleteQuery = string.Format("DELETE {0} WHERE {1}=@{1}", 
-                                            _tableName,
+                                            TableName,
                                             nameof(DoorRecord.DoorID));
-            _db.Execute(deleteQuery, record);
+            Db.Execute(deleteQuery, record);
         }
 
-        public void ClearTable()
-        {
-            var deleteQuery = string.Format("DELETE {0}", _tableName);
-            _db.Execute(deleteQuery);
-        }
-
-        public IEnumerable<DoorRecord> Fetch()
-        {
-            return _db.Query<DoorRecord>(string.Format("SELECT * FROM {0}", _tableName));
-        }
-
-        public DoorRecord Save(DoorRecord record)
+        public override DoorRecord Save(DoorRecord record)
         {
             if (record.DoorID <= 0)
                 record.DoorID = Insert(record);
@@ -75,26 +60,26 @@ namespace Model.Model.Dao
             record.LastModifiedDate = DateTime.Now;
             var insertQuery = string.Format(@"INSERT INTO {0}({1}, {2}, {3}) VALUES (@{1}, @{2}, @{3}); 
                                               SELECT last_insert_rowid();",
-                                            _tableName,
+                                            TableName,
                                             nameof(DoorRecord.BuildingID),
                                             nameof(DoorRecord.Address),
                                             nameof(DoorRecord.LastModifiedDate));
 
 
-            return _db.ExecuteScalar<int>(insertQuery, record);
+            return Db.ExecuteScalar<int>(insertQuery, record);
         }
 
         private void Update(DoorRecord record)
         {
             record.LastModifiedDate = DateTime.Now;
             var updateQuery = string.Format("UPDATE {0} SET {1}=@{1}, {2}=@{2}, {3}=@{3} WHERE {4}=@{4}",
-                                            _tableName,
+                                            TableName,
                                             nameof(DoorRecord.BuildingID),
                                             nameof(DoorRecord.Address),
                                             nameof(DoorRecord.LastModifiedDate),
                                             nameof(DoorRecord.DoorID));
 
-            _db.Execute(updateQuery, record);
+            Db.Execute(updateQuery, record);
         }
     }
 }

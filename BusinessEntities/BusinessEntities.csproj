@@ -55,6 +55,13 @@
     <Compile Include="Common\ISaveRepository.cs" />
     <Compile Include="Constant.cs" />
     <Compile Include="Exceptions\IdNotFoundException.cs" />
+    <Compile Include="Repository\Interface\ITenantInteractionRepository.cs" />
+    <Compile Include="Repository\Record\IBuilding.cs" />
+    <Compile Include="Repository\Record\IDoor.cs" />
+    <Compile Include="Repository\Record\ITenant.cs" />
+    <Compile Include="Repository\Record\ITenantInteraction.cs" />
+    <Compile Include="Repository\Record\TenantInteraction.cs" />
+    <Compile Include="Repository\TenantInteractionRepository.cs" />
     <Compile Include="Repository\TenantRepository.cs" />
     <Compile Include="Repository\Interface\IBuidingRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

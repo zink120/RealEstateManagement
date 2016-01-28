@@ -6,7 +6,7 @@ namespace Model.DB
 {
     public class DbHelper : IDbHelper
     {
-        private IDb _db;
+        private readonly IDb _db;
 
         public DbHelper(IDb db)
         {

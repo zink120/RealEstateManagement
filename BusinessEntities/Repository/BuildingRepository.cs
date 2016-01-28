@@ -15,7 +15,7 @@ namespace BusinessEntities.Repository
         private ConcurrentDictionary<int, IBuilding> _cache;
         private readonly object _lock = new object();
         private readonly IBuildingDao _dao;
-        private Lazy<IDoorRepository> _doorRepository;
+        private readonly Lazy<IDoorRepository> _doorRepository;
 
         public BuildingRepository(Lazy<IDoorRepository> doorRepository, IBuildingDao dao)
         {

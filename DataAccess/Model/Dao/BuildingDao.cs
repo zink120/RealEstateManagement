@@ -8,7 +8,7 @@ namespace Model.Model.Dao
     {
         public int BuildingID { get; internal set; }
         public string Name { get; set; }
-        public DateTime LastModifiedDate { get; set; }
+        public DateTime LastModifiedDate { get; internal set; }
 
         public override string ToString()
         {
@@ -18,49 +18,36 @@ namespace Model.Model.Dao
 
     public interface IBuildingDao : IGenericDao<BuildingRecord>, ICreateDbTable {}
 
-    public class BuildingDao : IBuildingDao
+    public class BuildingDao : DaoAbstract<BuildingRecord>, IBuildingDao
     {
-        private IDbHelper _db;
-        private const string _tableName = "Building";
-        public BuildingDao(IDbHelper db)
+        public BuildingDao(IDbHelper db) : base (db, "Building")
         {
-            _db = db;
         }
 
-        public void CreateTable()
+
+        public override void CreateTable()
         {
             var createQuery = string.Format(@"DROP TABLE IF EXISTS {0};
                                             CREATE TABLE  {0} (
                                             {1} INTEGER PRIMARY KEY AUTOINCREMENT,
                                             {2} VARCHAR(250) NOT NULL,
                                             {3} DATETIME NOT NULL);",
-                                            _tableName,
+                                            TableName,
                                             nameof(BuildingRecord.BuildingID),
                                             nameof(BuildingRecord.Name),
                                             nameof(BuildingRecord.LastModifiedDate));
-            _db.Execute(createQuery);
+            Db.Execute(createQuery);
         }
 
-        public void Delete(BuildingRecord record)
+        public override void Delete(BuildingRecord record)
         {
             var deleteQuery = string.Format("DELETE {0} WHERE {1}=@{1}",
-                                            _tableName,
+                                            TableName,
                                             nameof(record.BuildingID));
-            _db.Execute(deleteQuery, record);
+            Db.Execute(deleteQuery, record);
         }
 
-        public void ClearTable()
-        {
-            var deleteQuery = string.Format("DELETE {0}", _tableName);
-            _db.Execute(deleteQuery);
-        }
-
-        public IEnumerable<BuildingRecord> Fetch()
-        {
-            return _db.Query<BuildingRecord>($"SELECT * FROM {_tableName}");
-        }
-
-        public BuildingRecord Save(BuildingRecord record)
+        public override BuildingRecord Save(BuildingRecord record)
         {
             if (record.BuildingID <= 0)
                 record.BuildingID = Insert(record);
@@ -73,24 +60,24 @@ namespace Model.Model.Dao
         {
             record.LastModifiedDate = DateTime.Now;
             var insertQuery = string.Format("INSERT INTO {0}({1}, {2}) VALUES (@{1}, @{2}); SELECT last_insert_rowid();",
-                                            _tableName,
+                                            TableName,
                                             nameof(record.Name),
                                             nameof(record.LastModifiedDate));
 
 
-            return _db.ExecuteScalar<int>(insertQuery, record);
+            return Db.ExecuteScalar<int>(insertQuery, record);
         }
 
         private void Update(BuildingRecord record)
         {
             record.LastModifiedDate = DateTime.Now;
             var updateQuery = string.Format("UPDATE {0} SET {1}=@{1}, {2}=@{2} WHERE {3}=@{3}",
-                                            _tableName,
+                                            TableName,
                                             nameof(record.Name),
                                             nameof(record.LastModifiedDate),
                                             nameof(record.BuildingID));
 
-            _db.Execute(updateQuery, record);
+            Db.Execute(updateQuery, record);
         }
 
 

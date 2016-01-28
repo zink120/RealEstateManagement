@@ -74,9 +74,12 @@
     <Compile Include="DB\Interface\IDbHelper.cs" />
     <Compile Include="DB\Interface\IGenericDao.cs" />
     <Compile Include="DB\SqLiteBase.cs" />
+    <Compile Include="Model\DaoAbstract.cs" />
+    <Compile Include="Model\Dao\InvoiceDao.cs" />
     <Compile Include="Model\Dao\TenantDao.cs" />
     <Compile Include="Model\Dao\BuildingDao.cs" />
     <Compile Include="Model\Dao\DoorDao.cs" />
+    <Compile Include="Model\Dao\TenantInteractionDao.cs" />
     <Compile Include="Model\IModelFactory.cs" />
     <Compile Include="Model\ModelFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

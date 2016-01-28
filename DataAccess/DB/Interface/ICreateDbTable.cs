@@ -8,6 +8,7 @@ namespace Model.DB.Interface
 {
     public interface ICreateDbTable
     {
+        void DropTable();
         void CreateTable();
     }
 }

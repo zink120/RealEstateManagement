@@ -7,7 +7,5 @@
         mc:Ignorable="d"
         WindowState="Maximized"
         Title="Gestion locatif">
-    <Grid>
-        
-    </Grid>
+    <Grid />
 </Window>

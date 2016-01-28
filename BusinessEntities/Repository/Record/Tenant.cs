@@ -1,18 +1,18 @@
-﻿using Model.Model.Dao;
-using System;
+﻿using System;
+using Model.Model.Dao;
 using System.Collections.Generic;
 
 namespace BusinessEntities.Repository.Record
 {
-    public interface ITenant
-    {
-        int TenantID { get; }
-        int DoorID { get; }
-        string FirstName { get; }
-        string LastName { get; }
-        DateTime LastModifiedDate { get; }
-    }
     public class Tenant : TenantRecord, ITenant
     {
+        private readonly Lazy<IEnumerable<ITenantInteraction>> _tenantInteraction;
+
+        public Tenant(Lazy<IEnumerable<ITenantInteraction>> tenantInteraction)
+        {
+            _tenantInteraction = tenantInteraction;
+        }
+
+        public IEnumerable<ITenantInteraction> TenantInteractions => _tenantInteraction.Value;
     }
 }
